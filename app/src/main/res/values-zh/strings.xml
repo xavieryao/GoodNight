@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GoodNight</string>
+    <string name="enjoy">Relax and enjoy!</string>
+    <string name="menu_timer">睡眠定时</string>
+    <string name="menu_info">关于</string>
+    <string name="time_picker_dialog_title">睡眠定时</string>
+    <string name="date_time_update">更新</string>
+    <string name="date_time_set">设定</string>
+    <string name="clear">清除</string>
+    <string name="has_not_set_timer">在屏幕锁定后经过一段时间自动关闭</string>
+    <string name="has_set_hour" formatted="false">屏幕锁定\n%d小时%d分钟后关闭</string>
+    <string name="has_set" formatted="false">屏幕锁定\n%分钟后关闭</string>
+
+</resources>

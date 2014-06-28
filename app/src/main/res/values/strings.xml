@@ -2,9 +2,15 @@
 <resources>
 
     <string name="app_name">GoodNight</string>
-    <string name="hello_world">Hello world!</string>
     <string name="enjoy">Relax and enjoy!</string>
     <string name="menu_timer">Timer</string>
     <string name="menu_info">Info</string>
+    <string name="time_picker_dialog_title">Sleep Timer</string>
+    <string name="date_time_update">Update</string>
+    <string name="date_time_set">Set</string>
+    <string name="clear">Clear</string>
+    <string name="has_not_set_timer">Pause sometime after screen turned off.</string>
+    <string name="has_set_hour" formatted="false">App will pause\n%d hour(s) %d minute(s) after screen turns off.</string>
+    <string name="has_set" formatted="false">App will pause\n%d minute(s) after screen turns off.</string>
 
 </resources>

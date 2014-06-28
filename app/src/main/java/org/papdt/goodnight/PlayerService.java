@@ -1,13 +1,16 @@
 package org.papdt.goodnight;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.lang.Override;
@@ -16,6 +19,7 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
 
     public static final String TAG = "PlayerService";
     public static final int NOTIFICATION_ID = 970809;
+    public static final int REQUEST_CODE = 970809;
     public static final long NULL = -1l;
 
     public static final String ACTION_PLAY = "org.papdt.goodnight.action_play";
@@ -28,6 +32,8 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
     private Notification mNotification;
     private Intent mItPaused,mItPlaying;
     private ScreenStateReceiver mReceiver;
+    private PendingIntent mPendingIntent;
+    private AlarmManager mAlarmManager;
     private long mTimer;
 
     @Override
@@ -35,6 +41,7 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
         super.onCreate();
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.rainymood);
         mPlayer.setLooping(true);
+        mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 
         MessageSenderThread t = new MessageSenderThread();
         t.start();
@@ -55,16 +62,46 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
             play();
         }else if (action.equals(ACTION_PAUSE)){
             Log.d(TAG,"pause action received");
+            if(mPendingIntent != null){
+                mAlarmManager.cancel(mPendingIntent);
+            }
             pause();
         }else if(action.equals(Intent.ACTION_SCREEN_OFF)){
             //Screen off
+            Log.d(TAG,"Screen turned off.");
+            if(mTimer != NULL){
+                switchOnTimer();
+            }
         }else if(action.equals(Intent.ACTION_SCREEN_ON)){
-            //Screen on
+            Log.d(TAG,"Screen turned on.");
+            if(mTimer != NULL){
+                switchOffTimer();
+            }
         }else if(action.equals(ACTION_TIMER)){
-            //Set timer
+            mTimer = intent.getLongExtra(MainActivity.PREF_TIMER,NULL);
+            Log.d(TAG,"timer changed to "+mTimer);
         }
 
         return START_STICKY;
+    }
+
+    private void switchOnTimer() {
+        if(mPendingIntent == null){
+            Intent i = new Intent(getApplicationContext(),PlayerService.class);
+            i.setAction(ACTION_PAUSE);
+            mPendingIntent = PendingIntent
+                    .getService(getApplicationContext()
+                            , REQUEST_CODE, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        }
+        Log.d(TAG,"Timer is on.");
+        mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                  mTimer + SystemClock.elapsedRealtime(),1000 * 60,mPendingIntent);
+    }
+
+    private void switchOffTimer() {
+        Log.d(TAG,"Timer canceled.");
+        mAlarmManager.cancel(mPendingIntent);
     }
 
     @Override
@@ -79,13 +116,11 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
 
     @Override
     public IBinder onBind(Intent i) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     private void play(){
         mPlayer.start();
-        mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         //Foreground
         if(mNotification == null){
             PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
@@ -109,6 +144,10 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
             IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
             filter.addAction(Intent.ACTION_SCREEN_ON);
             registerReceiver(mReceiver,filter);
+        }
+        if(mTimer == NULL){
+            SharedPreferences prefs = getSharedPreferences(MainActivity.PREFERENCE_TAG,MODE_PRIVATE);
+            mTimer = prefs.getLong(MainActivity.PREF_TIMER,NULL);
         }
     }
 

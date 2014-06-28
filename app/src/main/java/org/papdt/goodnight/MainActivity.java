@@ -100,10 +100,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
         @Override
         public void onReceive(Context context, Intent intent) {
             //Received broadcast: now playing.
-            if(intent.getAction().equals(PlayerService.ACTION_PLAYING)) {// If necessary, set button image to pause.
+            if(intent.getAction().equals(PlayerService.ACTION_PLAYING) && !mIsPlaying) {// If necessary, set button image to pause.
                 mIvPlay.setImageResource(R.drawable.pause);
                 mIsPlaying = true;
-            }else{
+            }else if(intent.getAction().equals(PlayerService.ACTION_PAUSED) && mIsPlaying){
                 mIvPlay.setImageResource(R.drawable.play);
                 mIsPlaying = false;
             }
