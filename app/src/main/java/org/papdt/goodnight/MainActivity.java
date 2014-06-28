@@ -81,6 +81,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.menu_info:
+                AboutDialog dialog = new AboutDialog();
+                dialog.show(getFragmentManager(),"About");
                 return true;
             case R.id.menu_timer:
                 pickTime();
