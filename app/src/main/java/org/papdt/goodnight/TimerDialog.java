@@ -92,7 +92,8 @@ public class TimerDialog extends AlertDialog
         super(context, theme);
         mCallback = callBack;
         if(existingTimer != PlayerService.NULL){
-            final Date d = new Date(existingTimer);
+            final Date d = new Date();
+            d.setTime(existingTimer + d.getTimezoneOffset() * 60 * 1000);
             mInitialHourOfDay = d.getHours();
             mInitialMinute = d.getMinutes();
             mHasSet = true;

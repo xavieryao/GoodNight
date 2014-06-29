@@ -32,7 +32,7 @@
         android:paddingRight="16dip"
         android:text="@string/has_not_set_timer"
         android:id="@+id/tv_time_picker"
-        style="@android:style/TextAppearance.Holo.Medium"
+        android:textAppearance="@android:style/TextAppearance.Holo.Medium"
         />
 
     <TimePicker

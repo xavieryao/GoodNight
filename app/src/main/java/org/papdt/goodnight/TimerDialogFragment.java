@@ -35,7 +35,6 @@ public class TimerDialogFragment extends DialogFragment implements TimerDialog.O
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         Date d = new Date(0);
-        Log.d(TAG,"offset"+d.getTimezoneOffset());
         d.setHours(hourOfDay);
         d.setMinutes(minute - d.getTimezoneOffset());
 
