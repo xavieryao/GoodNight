@@ -21,16 +21,22 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
     public static final int NOTIFICATION_ID = 970809;
     public static final int REQUEST_CODE = 970809;
     public static final long NULL = -1l;
-
+/*
+ * Actions
+ */
     public static final String ACTION_PLAY = "org.papdt.goodnight.action_play";
     public static final String ACTION_PAUSE = "org.papdt.goodnight.action_pause";
-    public static final String ACTION_PLAYING = "org.papdt.goodnight.action_playing";
-    public static final String ACTION_PAUSED = "org.papdt.goodnight.action_paused";
+    public static final String ACTION_STOP = "org.papdt.goodnight.action_stop";
     public static final String ACTION_TIMER = "org.papdt.goodnight.action_timer";
+    public static final String ACTION_QUERY_STATE = "org.papdt.goodnight.action_query_state";
+    public static final String ACTION_ANSWER_QUERY = "org.papdt.goodnight.action_answer_query";
 
+/*
+ * Extra Key
+ */
+    public static final String EXTRA_STATE = "org.papdt.goodnight.extra_is_playing";
     private MediaPlayer mPlayer;
     private Notification mNotification;
-    private Intent mItPaused,mItPlaying;
     private ScreenStateReceiver mReceiver;
     private PendingIntent mPendingIntent;
     private AlarmManager mAlarmManager;
@@ -42,9 +48,6 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.rainymood);
         mPlayer.setLooping(true);
         mPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-
-        MessageSenderThread t = new MessageSenderThread();
-        t.start();
 
         mTimer = getSharedPreferences(MainActivity.PREFERENCE_TAG,MODE_PRIVATE)
                 .getLong(MainActivity.PREF_TIMER,NULL);
@@ -66,6 +69,9 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
                 mAlarmManager.cancel(mPendingIntent);
             }
             pause();
+        }else if(action.equals(ACTION_STOP)){
+            Log.d(TAG,"stop action received");
+            stop();
         }else if(action.equals(Intent.ACTION_SCREEN_OFF)){
             //Screen off
             Log.d(TAG,"Screen turned off.");
@@ -80,15 +86,26 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
         }else if(action.equals(ACTION_TIMER)){
             mTimer = intent.getLongExtra(MainActivity.PREF_TIMER,NULL);
             Log.d(TAG,"timer changed to "+mTimer);
+        }else if(action.equals(ACTION_QUERY_STATE)){
+            Log.d(TAG,"query received.");
+            answerStateQuery();
         }
 
         return START_STICKY;
     }
 
+    private void answerStateQuery() {
+        Intent i = new Intent(ACTION_ANSWER_QUERY);
+        boolean isPlaying = mPlayer.isPlaying();
+        Log.d(TAG,"answer query:"+ isPlaying);
+        i.putExtra(EXTRA_STATE,isPlaying);
+        sendBroadcast(i);
+    }
+
     private void switchOnTimer() {
         if(mPendingIntent == null){
             Intent i = new Intent(getApplicationContext(),PlayerService.class);
-            i.setAction(ACTION_PAUSE);
+            i.setAction(ACTION_STOP);
             mPendingIntent = PendingIntent
                     .getService(getApplicationContext()
                             , REQUEST_CODE, i, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -107,11 +124,7 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
     @Override
     public void onDestroy(){
         super.onDestroy();
-        mPlayer.release();
-        mPlayer = null;
-        if(mReceiver !=null){
-            unregisterReceiver(mReceiver);
-        }
+        stop();
     }
 
     @Override
@@ -125,7 +138,7 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
         if(mNotification == null){
             PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                     new Intent(getApplicationContext(), MainActivity.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT),
+                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
                     PendingIntent.FLAG_UPDATE_CURRENT);
             CharSequence str = getText(R.string.enjoy);
             mNotification = new Notification.Builder(getApplication())
@@ -156,6 +169,14 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
         stopForeground(true);
     }
 
+    private void stop(){
+        mPlayer.release();
+        mPlayer = null;
+        if(mReceiver !=null){
+            unregisterReceiver(mReceiver);
+        }
+    }
+
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
         mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.rainymood);
@@ -163,31 +184,5 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
         return true;
     }
 
-    private class MessageSenderThread extends Thread{
-        private PowerManager mPm = (PowerManager) getSystemService(POWER_SERVICE);
 
-        @Override
-        public void run(){
-            while(true){
-                if(mPm.isScreenOn()){
-                    if(mPlayer.isPlaying()){
-                        if(mItPlaying == null){
-                            mItPlaying = new Intent(ACTION_PLAYING);
-                        }
-                        sendBroadcast(mItPlaying);
-                    }else{
-                        if(mItPaused == null){
-                            mItPaused = new Intent(ACTION_PAUSED);
-                        }
-                        sendBroadcast(mItPaused);
-                    }
-                }
-                try {
-                    sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 }

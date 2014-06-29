@@ -2,7 +2,6 @@ package org.papdt.goodnight;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,8 +39,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
         mIvPlay = (ImageView) findViewById(R.id.iv_play);
         mIvPlay.setOnClickListener(this);
         mReceiver = new PlayStatusReceiver();
-        IntentFilter filter = new IntentFilter(PlayerService.ACTION_PLAYING);
+        IntentFilter filter = new IntentFilter(PlayerService.ACTION_ANSWER_QUERY);
         registerReceiver(mReceiver,filter);
+
+        Intent query = new Intent(this,PlayerService.class);
+        query.setAction(PlayerService.ACTION_QUERY_STATE);
+        startService(query);
 	}
 
     @Override
@@ -131,10 +134,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
         @Override
         public void onReceive(Context context, Intent intent) {
             //Received broadcast: now playing.
-            if(intent.getAction().equals(PlayerService.ACTION_PLAYING) && !mIsPlaying) {// If necessary, set button image to pause.
+            if(intent.getBooleanExtra(PlayerService.EXTRA_STATE,false)) {// Already playing.
                 mIvPlay.setImageResource(R.drawable.pause);
                 mIsPlaying = true;
-            }else if(intent.getAction().equals(PlayerService.ACTION_PAUSED) && mIsPlaying){
+            }else{
                 mIvPlay.setImageResource(R.drawable.play);
                 mIsPlaying = false;
             }
