@@ -6,6 +6,8 @@
     android:id="@+id/sv">
     <TextView
         android:layout_width="200dip"
+        android:layout_marginTop="10dip"
+        android:paddingTop="5dip"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="center"

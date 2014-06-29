@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Good Night</string>
-    <string name="version_name">1.0.0</string>
+    <string name="version_name" translatable="false">1.0.0</string>
     <string name="enjoy">Relax and enjoy!</string>
     <string name="menu_timer">Timer</string>
     <string name="menu_info">Info</string>
@@ -10,15 +10,18 @@
     <string name="date_time_update">Update</string>
     <string name="date_time_set">Set</string>
     <string name="clear">Clear</string>
+    <string name="about">About</string>
+    <string name="headphone_alert">Using headphones may cause unrecoverable damage to your hearing.</string>
     <string name="has_not_set_timer">Pause sometime after screen turned off.</string>
     <string name="has_set_hour" formatted="false">App will pause\n%d hour(s) %d minute(s) after screen turns off.</string>
     <string name="has_set" formatted="false">App will pause\n%d minute(s) after screen turns off.</string>
-    <string name="about">
+    <string name="the_great_gatsby" translatable="false">
         "Then wear the gold hat, if that will move her;
 If you can bounce high, bounce high for her too,
 Till she cry 'Lover, gold-hatted, high-bouncing lover,
 I must have you!'
-----THOMAS PARKE D'INVILLIERS
-Xavier Yao\nAll rights reserved.\nAudio licensed under Creative Common Sample Plus 1.0"
+----THOMAS PARKE D'INVILLIERS\n\n</string>
+    <string name="copyright" translatable="false">Xavier Yao\n&lt;xavieryao@me.com&gt;\nAll rights reserved.\n\n</string>
+    <string name="audio_license" translatable="false">Audio licensed under Creative Common Sample Plus 1.0"
     </string>
 </resources>

@@ -1,11 +1,14 @@
 package org.papdt.goodnight;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +29,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private PlayStatusReceiver mReceiver;
     private Intent mItPlay;
     private Intent mItPause;
+    private AlertDialog mDialogWarn;
+    private AudioManager mAudioManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,23 +54,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
     public void onClick(View view) {
         if(view.getId() == R.id.iv_play){
             if(mIsPlaying){ // Now Playing. Click to pause.
-                if(mItPause == null){
-                    mItPause = new Intent(this,PlayerService.class);
-                    mItPause.setAction(PlayerService.ACTION_PAUSE);
-                }
-                startService(mItPause);
-                mIsPlaying = false;
-                mIvPlay.setImageResource(R.drawable.play);
-                Log.d(TAG,"startService:pause");
+                onPauseClicked();
             }else{ //Play
-                if(mItPlay == null){
-                    mItPlay = new Intent(this,PlayerService.class);
-                    mItPlay.setAction(PlayerService.ACTION_PLAY);
-                }
-                startService(mItPlay);
-                mIsPlaying = true;
-                mIvPlay.setImageResource(R.drawable.pause);
-                Log.d(TAG,"startService:play");
+                onPlayClicked();
             }
         }
     }
@@ -95,6 +86,44 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private void pickTime() {
         TimerDialogFragment dialog = new TimerDialogFragment();
         dialog.show(getFragmentManager(),"TimerDialog");
+    }
+
+    private void onPlayClicked(){
+        if(mItPlay == null){
+            mItPlay = new Intent(this,PlayerService.class);
+            mItPlay.setAction(PlayerService.ACTION_PLAY);
+        }
+        startService(mItPlay);
+        mIsPlaying = true;
+        mIvPlay.setImageResource(R.drawable.pause);
+        if(mAudioManager == null){
+            mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        }
+        if(mAudioManager.isWiredHeadsetOn() && mDialogWarn == null){
+            mDialogWarn = new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(android.R.string.dialog_alert_title)
+                    .setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    })
+                    .create();
+            mDialogWarn.show();
+        }
+        Log.d(TAG,"startService:play");
+    }
+
+    private void onPauseClicked(){
+        if(mItPause == null){
+            mItPause = new Intent(this,PlayerService.class);
+            mItPause.setAction(PlayerService.ACTION_PAUSE);
+        }
+        startService(mItPause);
+        mIsPlaying = false;
+        mIvPlay.setImageResource(R.drawable.play);
+        Log.d(TAG,"startService:pause");
     }
 
     private class PlayStatusReceiver extends BroadcastReceiver{
