@@ -103,9 +103,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
             mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         }
         if(mAudioManager.isWiredHeadsetOn() && mDialogWarn == null){
+            Log.d(TAG,"wire warn");
             mDialogWarn = new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle(android.R.string.dialog_alert_title)
+                    .setMessage(R.string.headphone_alert)
                     .setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
