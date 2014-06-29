@@ -3,7 +3,7 @@
     package="org.papdt.goodnight"
     android:installLocation="preferExternal"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="@string/version_name" >
 
     <uses-sdk
         android:minSdkVersion="15"

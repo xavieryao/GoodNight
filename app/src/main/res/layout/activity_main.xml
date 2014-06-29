@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:src="@drawable/play"
+        android:alpha="0.67"
         android:id="@+id/iv_play" />
 
 </RelativeLayout>
