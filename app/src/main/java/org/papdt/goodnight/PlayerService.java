@@ -170,8 +170,10 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
     }
 
     private void stop(){
-        mPlayer.release();
-        mPlayer = null;
+        if(mPlayer != null){
+            mPlayer.release();
+            mPlayer = null;
+        }
         if(mReceiver !=null){
             unregisterReceiver(mReceiver);
         }
