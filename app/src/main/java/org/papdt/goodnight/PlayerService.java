@@ -65,9 +65,6 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
             play();
         }else if (action.equals(ACTION_PAUSE)){
             Log.d(TAG,"pause action received");
-            if(mPendingIntent != null){
-                mAlarmManager.cancel(mPendingIntent);
-            }
             pause();
         }else if(action.equals(ACTION_STOP)){
             Log.d(TAG,"stop action received");
@@ -112,8 +109,8 @@ public class PlayerService extends Service implements MediaPlayer.OnErrorListene
             mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         }
         Log.d(TAG,"Timer is on.");
-        mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                  mTimer + SystemClock.elapsedRealtime(),1000 * 60,mPendingIntent);
+        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                  mTimer + SystemClock.elapsedRealtime(),mPendingIntent);
     }
 
     private void switchOffTimer() {
